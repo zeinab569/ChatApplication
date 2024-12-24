@@ -1,0 +1,146 @@
+﻿@model ChatVM
+
+<style>
+    .message-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 50%;
+        margin: 0 auto;
+    }
+
+    .receiver-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .first-letter {
+        width: 100px;
+        height: 100px;
+        background-color: darkblue;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 60px;
+        color: white;
+    }
+
+    .messages-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        height: 400px;
+        overflow-y: auto;
+        border: 1px solid #e6e6e6;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+
+    .message {
+        padding: 10px;
+        margin: 5px;
+        border-radius: 5px;
+        max-width: 70%;
+    }
+
+    .sent-message {
+        background-color: #e6e6e6;
+        align-self: flex-end;
+    }
+
+    .received-message {
+        background-color: #f1f1f1;
+        align-self: flex-start;
+    }
+
+    .send-message-box {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .message-feild {
+        width: 80%;
+        margin-right: 10px;
+    }
+
+    .send-btn {
+        width: 20%;
+    }
+</style>
+<div class="message-wrap">
+    <div class="receiver-info">
+        <div class="first-letter">
+            @* Get first letter of user name to display as a image *@
+            @Model.RecevierUserName.Substring(0, 1).ToUpper()
+        </div>
+        <h3>@Model.RecevierUserName</h3>
+    </div>
+
+    <div class="messages-box">
+        @foreach (var item in Model.Messages)
+        {
+            if (item.IsCurrentUserSentMessage)
+            {
+                @* Current user message *@
+                <div class="message sent-message">
+                    <p>@item.Text</p>
+                    <span>@item.Date @item.Time</span>
+                </div>
+            }
+            else
+            {
+                @* Receiver message *@
+                <div class="message received-message">
+                    <p>@item.Text</p>
+                    <span>@item.Date @item.Time</span>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="send-message-box">
+        <textarea rows="4" class="message-feild" placeholder="Type your message"></textarea>
+        <button class="send-btn btn btn-dark">Send</button>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+
+
+        $(document).ready(function () {
+            //build SignalR connection
+            var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+            // start the connection
+            connection.start().then(function () {
+                console.log("SignalR Connected");
+            }).catch(function (err) {
+                return console.error(err.toString());
+            });
+
+            $(".send-btn").click(function () {
+                var message = $(".message-feild").val();
+                var receiverId = @Model.RecevierId;
+                // invoke chathub send message 
+                connection.invoke("SendMessage", receiverId, message).catch(function (err) {
+                    $(".message-feild").val("").focus();
+                });
+               
+                //append message in real time when any user send any message to current user 
+                connection.on("ReceiveMessage", function (message) {
+                    if (senderId == @Model.CurrentUserId) {
+                        $(".messages-box").append('<div class="message sent-message"><p>' + message.text + '</p><span>' + message.date + ' ' + message.time + '</span></div>');
+                    }
+                });
+
+                //go to last message 
+                var objDiv = document.getElementsByClassName("messages-box");
+                objDiv.scrollTop = objDiv.scrollHeight;
+
+            });
+        });
+    </script>
+}
