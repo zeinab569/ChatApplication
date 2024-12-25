@@ -1,41 +1,8 @@
 ﻿@model IEnumerable<MessageUsersListVM>
 
-<style>
-    .users {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .user {
-        border: 1px solid #e6e6e6;
-        padding: 15px;
-        width: 47%;
-        margin-bottom: 10px;
-    }
-
-    .first-letter {
-        width: 100px;
-        height: 100px;
-        background-color: darkblue;
-        border-radius: 50%;
-        text-align: center;
-        font-size: 60px;
-        color: white;
-    }
-
-    .user-info-wrap {
-        align-content: center;
-    }
-
-    .user-info {
-        text-align: center;
-    }
-
-    .chat-btn-wrap {
-        align-content: center;
-    }
-</style>
+<head>
+    <link rel="stylesheet" href="~/css/chat.css" />
+</head>
 
 <div class="users">
     @foreach (var item in Model)

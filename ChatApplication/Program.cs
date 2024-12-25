@@ -20,6 +20,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 

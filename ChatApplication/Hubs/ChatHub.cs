@@ -18,10 +18,6 @@ public class ChatHub : Hub
 
     public async Task SendMessage(string receiverId, string message)
     {
-        //var Now = DateTime.Now;
-        //var Date = Now.ToShortDateString();
-        //var Time = Now.ToShortTimeString();
-
         var senderId = _currentUserService.UserId;
         var newMessage = new Message
         {
